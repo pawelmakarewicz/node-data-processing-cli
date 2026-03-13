@@ -1,0 +1,1 @@
+// hash-compare command handler
