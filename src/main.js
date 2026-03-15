@@ -1,1 +1,3 @@
-// entry point, sets up REPL, handles navigation state
+import { repl } from "./repl.js";
+
+repl();
