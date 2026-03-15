@@ -9,9 +9,10 @@ export const argParser = ({ args, allowedArgs, booleanArgs = [] }) => {
         acc[name] = true;
       } else {
         const value = args[i + 1];
-        if (value && !value.startsWith("--")) {
-          acc[name] = value;
+        if (!value || value.startsWith("--")) {
+          throw new Error(`Missing value for --${name}`);
         }
+        acc[name] = value;
       }
     }
     return acc;

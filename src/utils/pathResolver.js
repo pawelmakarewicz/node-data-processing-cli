@@ -1,5 +1,7 @@
+import { homedir } from "os";
+
 class PathResolver {
-  #currentPath = process.cwd();
+  #currentPath = homedir();
 
   get() { return this.#currentPath; }
 

@@ -28,11 +28,20 @@ export const cd = async (currentPath, newPath) => {
 
 const ls = async (currentPath) => {
   const entries = await fs.readdir(currentPath, { withFileTypes: true });
-  return entries
-    .map(
-      (entry) => `${entry.name} [${entry.isDirectory() ? "folder" : "file"}]`,
-    )
-    .join("\n");
+
+  const folders = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+    .map((name) => `${name.padEnd(20)} [folder]`);
+
+  const files = entries
+    .filter((entry) => !entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+    .map((name) => `${name.padEnd(20)} [file]`);
+
+  return [...folders, ...files].join("\n");
 };
 
 export const navigation = () => {
@@ -50,7 +59,12 @@ export const navigation = () => {
     },
 
     ls: async () => {
-      console.log(await ls(pathResolver.get()));
+      try {
+        const result = await ls(pathResolver.get());
+        console.log(result);
+      } catch (error) {
+        console.log(`Error in ls: ${error.message}`);
+      }
     },
   };
 };

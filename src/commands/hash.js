@@ -3,6 +3,7 @@ import { createReadStream } from "fs";
 import { promises as fs } from "fs";
 import { argParser } from "../utils/argParser.js";
 import { pathResolver } from "../utils/pathResolver.js";
+import path from "path";
 
 const allowedArgs = ["input", "algorithm", "save"];
 const booleanArgs = ["save"];
@@ -24,7 +25,7 @@ export const hash = async (rawArgs) => {
   }
 
   const currentPath = pathResolver.get();
-  const inputPath = require("path").resolve(currentPath, args.input);
+  const inputPath = path.resolve(currentPath, args.input);
 
   try {
     await fs.access(inputPath);
@@ -32,20 +33,20 @@ export const hash = async (rawArgs) => {
     throw new Error(`Input file does not exist: ${inputPath}`);
   }
 
-  const hash = createHash(algorithm);
+  const hasher = createHash(algorithm);
   const stream = createReadStream(inputPath);
 
   await new Promise((resolve, reject) => {
-    stream.pipe(hash).on("finish", resolve).on("error", reject);
+    stream.pipe(hasher).on("finish", resolve).on("error", reject);
   });
 
-  const digest = hash.digest("hex");
+  const digest = hasher.digest("hex");
 
   const output = `${algorithm}: ${digest}`;
 
   if (args.save) {
-    const inputFilename = require("path").basename(inputPath);
-    const savePath = require("path").join(require("path").dirname(inputPath), `${inputFilename}.${algorithm}`);
+    const inputFilename = path.basename(inputPath);
+    const savePath = path.join(path.dirname(inputPath), `${inputFilename}.${algorithm}`);
 
     await fs.writeFile(savePath, digest);
     console.log(`Hash saved to: ${savePath}`);

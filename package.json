@@ -1,0 +1,16 @@
+{
+  "name": "node-data-processing-cli",
+  "version": "1.0.0",
+  "description": "Data Processing Toolkit CLI",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "keywords": ["cli", "data-processing"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.10.0"
+  }
+}

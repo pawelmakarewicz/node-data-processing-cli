@@ -1,0 +1,8 @@
+node_modules/
+*.log
+*.enc
+*.sha256
+*.md5
+*.sha512
+.DS_Store
+.vscode/
