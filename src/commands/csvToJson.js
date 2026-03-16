@@ -22,10 +22,10 @@ const createCsvToJsonTransform = () => {
           continue;
         }
 
-        const values = line.split(",");
+        const values = line.split(",").map(v => v.trim());
         const obj = {};
         headers.forEach((header, index) => {
-          obj[header.trim()] = values[index]?.trim() || "";
+          obj[header] = values[index]?.trim() || "";
         });
 
         this.push(isFirstObject ? "\n  " : ",\n  ");
