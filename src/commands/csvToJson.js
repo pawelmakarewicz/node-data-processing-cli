@@ -5,18 +5,13 @@ import { argParser } from "../utils/argParser.js";
 import { pathResolver } from "../utils/pathResolver.js";
 import path from "path";
 
-const allowedArgs = ["input", "output"];
+const argDefinitions = {
+  input: { required: true },
+  output: { required: true }
+};
 
 export const csvToJson = async (rawArgs) => {
-  const args = argParser({ args: rawArgs, allowedArgs });
-
-  if (!args.input) {
-    throw new Error("--input argument is required");
-  }
-
-  if (!args.output) {
-    throw new Error("--output argument is required");
-  }
+  const args = argParser({ args: rawArgs, argDefinitions });
 
   const currentPath = pathResolver.get();
   const inputPath = path.resolve(currentPath, args.input);

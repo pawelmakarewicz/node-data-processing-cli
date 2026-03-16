@@ -5,20 +5,17 @@ import { argParser } from "../utils/argParser.js";
 import { pathResolver } from "../utils/pathResolver.js";
 import path from "path";
 
-const allowedArgs = ["input", "algorithm", "save"];
-const booleanArgs = ["save"];
+const argDefinitions = {
+  input: { required: true },
+  algorithm: { default: "sha256" },
+  save: { type: "boolean", default: false }
+};
 const supportedAlgorithms = ["sha256", "md5", "sha512"];
 
-const DEFAULT_ALGORITHM = "sha256";
-
 export const hash = async (rawArgs) => {
-  const args = argParser({ args: rawArgs, allowedArgs, booleanArgs });
+  const args = argParser({ args: rawArgs, argDefinitions });
 
-  if (!args.input) {
-    throw new Error("--input argument is required");
-  }
-
-  const algorithm = args.algorithm || DEFAULT_ALGORITHM;
+  const algorithm = args.algorithm;
 
   if (!supportedAlgorithms.includes(algorithm)) {
     throw new Error(`Unsupported algorithm: ${algorithm}. Supported values: ${supportedAlgorithms.join(", ")}`);

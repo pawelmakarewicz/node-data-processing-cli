@@ -4,26 +4,18 @@ import { argParser } from "../utils/argParser.js";
 import { pathResolver } from "../utils/pathResolver.js";
 import path from "path";
 
-const allowedArgs = ["input", "output", "password"];
+const argDefinitions = {
+  input: { required: true },
+  output: { required: true },
+  password: { required: true }
+};
 const SALT_LENGTH = 16;
 const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
 const HEADER_LENGTH = SALT_LENGTH + IV_LENGTH;
 
 export const decrypt = async (rawArgs) => {
-  const args = argParser({ args: rawArgs, allowedArgs });
-
-  if (!args.input) {
-    throw new Error("--input argument is required");
-  }
-
-  if (!args.output) {
-    throw new Error("--output argument is required");
-  }
-
-  if (!args.password) {
-    throw new Error("--password argument is required");
-  }
+  const args = argParser({ args: rawArgs, argDefinitions });
 
   const currentPath = pathResolver.get();
   const inputPath = path.resolve(currentPath, args.input);

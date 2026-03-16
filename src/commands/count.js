@@ -3,14 +3,12 @@ import { argParser } from "../utils/argParser.js";
 import { pathResolver } from "../utils/pathResolver.js";
 import path from "path";
 
-const allowedArgs = ["input"];
+const argDefinitions = {
+  input: { required: true }
+};
 
 export const count = async (rawArgs) => {
-  const args = argParser({ args: rawArgs, allowedArgs });
-
-  if (!args.input) {
-    throw new Error("--input argument is required");
-  }
+  const args = argParser({ args: rawArgs, argDefinitions });
 
   const currentPath = pathResolver.get();
   const inputPath = path.resolve(currentPath, args.input);

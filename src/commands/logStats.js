@@ -9,18 +9,13 @@ import { pathResolver } from "../utils/pathResolver.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const allowedArgs = ["input", "output"];
+const argDefinitions = {
+  input: { required: true },
+  output: { required: true }
+};
 
 export const logStats = async (rawArgs) => {
-  const args = argParser({ args: rawArgs, allowedArgs });
-
-  if (!args.input) {
-    throw new Error("--input argument is required");
-  }
-
-  if (!args.output) {
-    throw new Error("--output argument is required");
-  }
+  const args = argParser({ args: rawArgs, argDefinitions });
 
   const currentPath = pathResolver.get();
   const inputPath = path.resolve(currentPath, args.input);
