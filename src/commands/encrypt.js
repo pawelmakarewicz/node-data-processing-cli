@@ -1,5 +1,7 @@
 import { createReadStream, createWriteStream, promises as fs } from "fs";
 import { createCipheriv, scryptSync, randomBytes } from "crypto";
+import { pipeline } from "stream/promises";
+import { Transform } from "stream";
 import { argParser } from "../utils/argParser.js";
 import { pathResolver } from "../utils/pathResolver.js";
 import path from "path";
@@ -9,10 +11,9 @@ const argDefinitions = {
   output: { required: true },
   password: { required: true }
 };
+
 const SALT_LENGTH = 16;
 const IV_LENGTH = 12;
-const AUTH_TAG_LENGTH = 16;
-const HEADER_LENGTH = SALT_LENGTH + IV_LENGTH;
 
 export const encrypt = async (rawArgs) => {
   const args = argParser({ args: rawArgs, argDefinitions });
@@ -27,40 +28,30 @@ export const encrypt = async (rawArgs) => {
     throw new Error(`Input file does not exist: ${inputPath}`);
   }
 
-  const readFile = createReadStream(inputPath);
-
   const salt = randomBytes(SALT_LENGTH);
   const iv = randomBytes(IV_LENGTH);
-
   const key = scryptSync(args.password, salt, 32);
-
   const cipher = createCipheriv("aes-256-gcm", key, iv);
 
-  const writeFile = createWriteStream(outputPath);
-
-  writeFile.write(salt);
-  writeFile.write(iv);
-
-  for await (const chunk of readFile) {
-    const encrypted = cipher.update(chunk);
-    if (encrypted) {
-      writeFile.write(encrypted);
+  const appendAuthTag = new Transform({
+    transform(chunk, encoding, callback) {
+      callback(null, chunk);
+    },
+    flush(callback) {
+      callback(null, cipher.getAuthTag());
     }
-  }
-
-  const final = cipher.final();
-  if (final) {
-    writeFile.write(final);
-  }
-
-  const authTag = cipher.getAuthTag();
-  writeFile.write(authTag);
-  writeFile.end();
-
-  await new Promise((resolve, reject) => {
-    writeFile.on("finish", resolve);
-    writeFile.on("error", reject);
   });
+
+  const writeStream = createWriteStream(outputPath);
+  writeStream.write(salt);
+  writeStream.write(iv);
+
+  await pipeline(
+    createReadStream(inputPath),
+    cipher,
+    appendAuthTag,
+    writeStream
+  );
 
   console.log(`File encrypted successfully: ${outputPath}`);
 };
