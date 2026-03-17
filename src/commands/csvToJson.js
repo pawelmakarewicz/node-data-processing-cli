@@ -1,6 +1,7 @@
 import { Transform } from "stream";
-import { createReadStream, createWriteStream, pipeline } from "stream/promises";
+import { createReadStream, createWriteStream } from "fs";
 import { promises as fs } from "fs";
+import { pipeline } from "stream/promises";
 import { argParser } from "../utils/argParser.js";
 import { pathResolver } from "../utils/pathResolver.js";
 import path from "path";
