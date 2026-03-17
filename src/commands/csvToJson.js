@@ -1,3 +1,15 @@
+import { Transform } from "stream";
+import { createReadStream, createWriteStream, pipeline } from "stream/promises";
+import { promises as fs } from "fs";
+import { argParser } from "../utils/argParser.js";
+import { pathResolver } from "../utils/pathResolver.js";
+import path from "path";
+
+const argDefinitions = {
+  input: { required: true },
+  output: { required: true }
+};
+
 const createCsvToJsonTransform = () => {
   let isFirstLine = true;
   let isFirstObject = true;
